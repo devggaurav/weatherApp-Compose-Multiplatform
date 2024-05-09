@@ -40,6 +40,9 @@ class WeatherApiImpl : WeatherApiService {
         install(HttpTimeout) {
             requestTimeoutMillis = 15000
         }
+        install(DefaultRequest) {
+
+        }
 
     }
 
