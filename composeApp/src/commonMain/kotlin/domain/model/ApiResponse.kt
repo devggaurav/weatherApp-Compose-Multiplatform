@@ -11,14 +11,14 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class Weather(
+data class WeatherRealm(
     @SerialName("hourly")
-    val weatherData: WeatherData
+    val weatherData: WeatherDataRealm
 )
 
 
 @Serializable
-data class WeatherData(
+data class WeatherDataRealm(
 
     val time: List<String>,
 

@@ -2,7 +2,8 @@ package data.remote.api
 
 import domain.WeatherApiService
 import domain.model.RequestState
-import domain.model.Weather
+import domain.model.WeatherRealm
+import domain.weather.WeatherInfo
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.DefaultRequest
@@ -13,6 +14,7 @@ import io.ktor.client.request.headers
 import io.ktor.client.statement.request
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import mappers.toWeatherInfo
 
 
 //
@@ -47,7 +49,7 @@ class WeatherApiImpl : WeatherApiService {
     }
 
 
-    override suspend fun getWeatherData(lat: Double, lon: Double): RequestState<Weather> {
+    override suspend fun getWeatherData(lat: Double, lon: Double): RequestState<WeatherInfo> {
         return try {
             val response = httpClient.get(ENDPOINT) {
                 url {
@@ -57,9 +59,9 @@ class WeatherApiImpl : WeatherApiService {
             }
             if (response.status.value == 200) {
                 println("Api response: ${response.body<String>()}")
-                val apiResponse = Json.decodeFromString<Weather>(response.body())
+                val apiResponse = Json.decodeFromString<WeatherRealm>(response.body())
 
-                RequestState.Success(data = apiResponse)
+                RequestState.Success(data = apiResponse.toWeatherInfo())
             } else {
                 RequestState.Error(message = "Http Error code: ${response.status}")
             }

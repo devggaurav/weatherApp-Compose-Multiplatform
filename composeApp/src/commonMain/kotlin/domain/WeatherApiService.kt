@@ -1,7 +1,7 @@
 package domain
 
 import domain.model.RequestState
-import domain.model.Weather
+import domain.weather.WeatherInfo
 
 
 //
@@ -11,5 +11,5 @@ import domain.model.Weather
 
 interface WeatherApiService {
 
-    suspend fun getWeatherData(lat: Double, lon : Double) : RequestState<Weather>
+    suspend fun getWeatherData(lat: Double, lon : Double) : RequestState<WeatherInfo>
 }
