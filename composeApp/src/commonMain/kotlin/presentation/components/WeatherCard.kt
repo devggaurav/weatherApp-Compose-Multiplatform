@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.sp
 import kotlinx.datetime.LocalDateTime
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ui.theme.primaryColor
+import ui.theme.primaryContainerDark
 import ui.theme.surfaceColor
 import ui.theme.textColor
 import weatherappcmm.composeapp.generated.resources.Res
@@ -46,7 +48,7 @@ fun WeatherCard(state: WeatherState) {
 
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = surfaceColor,
+                containerColor = primaryContainerDark,
                 contentColor = textColor
             ),
             shape = RoundedCornerShape(10.dp),
@@ -60,8 +62,19 @@ fun WeatherCard(state: WeatherState) {
                 ),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                val hour = if (data.time.hour < 10) {
+                    "0${data.time.hour}"
+                } else {
+                    data.time.hour.toString()
+                }
+                val minute = if (data.time.minute < 10) {
+                    "0${data.time.minute}"
+                } else {
+                    data.time.minute.toString()
+                }
+
                 Text(
-                    text = "Today ${data.time.hour}:${data.time.minute}",
+                    text = "Today ${hour}:${minute}",
                     modifier = Modifier.align(Alignment.End),
                     color = Color.White
                 )
@@ -83,7 +96,7 @@ fun WeatherCard(state: WeatherState) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround
-                ){
+                ) {
 
                     WeatherDataDisplay(
                         value = data.pressure.roundToInt(),

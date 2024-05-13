@@ -1,15 +1,16 @@
 import SwiftUI
+import ComposeApp
 
 @main
 struct iOSApp: App {
 
-init() {
-           KoinModuleKt.initializeKoin()
+   init() {
+           AppModuleKt.initializeKoin()
        }
 
-	var body: some Scene {
-		WindowGroup {
-			ContentView()
-		}
-	}
+    var body: some Scene {
+        WindowGroup {
+            ContentView().ignoresSafeArea()
+        }
+    }
 }
