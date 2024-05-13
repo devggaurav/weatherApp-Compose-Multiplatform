@@ -1,4 +1,4 @@
-# This is a Kotlin Multiplatform Weather Application targeting Android, iOS. 
+# This is a Compose Multiplatform Weather Application targeting Android, iOS. 
 
 
 
