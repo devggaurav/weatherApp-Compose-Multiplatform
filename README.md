@@ -1,4 +1,4 @@
-This is a Kotlin Multiplatform project targeting Android, iOS.
+This is a Kotlin Multiplatform Weather Application targeting Android, iOS. 
 
 * `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
   It contains several subfolders:
@@ -11,4 +11,9 @@ This is a Kotlin Multiplatform project targeting Android, iOS.
   you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
 
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+
+
+![iPhone 15 Pro]
+<img src="https://github.com/devggaurav/weatherAppCmm/assets/42926809/6bf64eaf-3324-43ae-b4ca-d2abe9d84d26" height="500px"> 
+![Android]
+<img src="https://github.com/devggaurav/weatherAppCmm/assets/42926809/d8a4fe3e-02a0-433c-a7ae-a3c136c34e16" height="500px">
