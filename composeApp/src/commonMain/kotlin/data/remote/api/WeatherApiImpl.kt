@@ -37,6 +37,7 @@ class WeatherApiImpl : WeatherApiService {
                 prettyPrint = true
                 isLenient = true
                 ignoreUnknownKeys = true
+                useAlternativeNames = false
             })
         }
         install(HttpTimeout) {
@@ -59,7 +60,9 @@ class WeatherApiImpl : WeatherApiService {
             }
             if (response.status.value == 200) {
                 println("Api response: ${response.body<String>()}")
-                val apiResponse = Json.decodeFromString<WeatherRealm>(response.body())
+                val json = Json { ignoreUnknownKeys = true }
+                val apiResponse = json.decodeFromString<WeatherRealm>(response.body())
+                println("Api response 2: ${apiResponse.weatherData.time}")
 
                 RequestState.Success(data = apiResponse.toWeatherInfo())
             } else {
@@ -68,6 +71,7 @@ class WeatherApiImpl : WeatherApiService {
 
 
         } catch (ex: Exception) {
+            println("Api ERROR ${ex.message.toString()}")
             RequestState.Error(ex.message.toString())
         }
 
