@@ -6,7 +6,7 @@ package util
 // Copyright (c) 2024 CFA. All rights reserved.
 //
 
-interface LocationProvider {
+expect class LocationProvider  {
 
     suspend fun requestLocationPermission(): Boolean
     suspend fun getLastKnownLocation(): Location?
