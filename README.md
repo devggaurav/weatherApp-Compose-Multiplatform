@@ -22,3 +22,6 @@
 
 
 This app uses [***MVVM (Model View View-Model)***](https://developer.android.com/jetpack/docs/guide#recommended-app-arch) architecture.
+
+
+## Handling Location permission for IOS and Android is in Progress..... Contribution welcome :) 
