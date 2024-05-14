@@ -34,6 +34,7 @@ kotlin {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.android)
+            implementation(libs.google.play.services.android.location)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
