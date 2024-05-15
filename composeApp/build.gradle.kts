@@ -35,6 +35,8 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.android)
             implementation(libs.google.play.services.android.location)
+            implementation(libs.koin.android)
+            implementation(libs.koin.androidx.compose)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -44,7 +46,8 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
 
-            implementation(libs.koin.core)
+            api(libs.koin.core)
+            implementation(libs.koin.compose)
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.screenModel)
             implementation(libs.voyager.transitions)

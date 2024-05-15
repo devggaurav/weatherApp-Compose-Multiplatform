@@ -26,6 +26,7 @@ val appModule = module {
 
 fun initializeKoin() {
     startKoin {
+
         modules(appModule)
     }
 }
