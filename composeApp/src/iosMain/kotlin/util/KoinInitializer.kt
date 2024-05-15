@@ -1,5 +1,8 @@
 package util
 
+import di.appModule
+import org.koin.core.context.startKoin
+
 
 //
 // Created by Code For Android on 15/05/24.
@@ -8,6 +11,12 @@ package util
 
 actual class KoinInitializer {
 
-    actual fun initialize() {}
+    actual fun initialize() {
+
+        startKoin {
+            modules(appModule)
+
+        }
+    }
 
 }

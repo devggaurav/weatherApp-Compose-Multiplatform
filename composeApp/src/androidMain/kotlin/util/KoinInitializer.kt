@@ -1,6 +1,9 @@
 package util
 
 import android.content.Context
+import com.gc.weatherapp.fusedLocationModule
+import di.appModule
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
 
@@ -15,9 +18,9 @@ actual class KoinInitializer(
     actual fun initialize() {
         // Initialize Koin
         startKoin {
-            // modules
-            // ...
-           // androidContext(application)
+            androidContext(application)
+            modules(appModule, fusedLocationModule)
+
         }
     }
 
