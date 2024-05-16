@@ -9,6 +9,7 @@ import domain.WeatherApiService
 import domain.model.RequestState
 import kotlinx.coroutines.launch
 import presentation.components.WeatherState
+import util.LocationProvider
 
 
 //
@@ -17,10 +18,14 @@ import presentation.components.WeatherState
 //
 
 class HomeScreenViewModel(
-    private val api: WeatherApiService
+    private val api: WeatherApiService,
+    private val locationManager: LocationProvider
 ) : ScreenModel {
 
     var state by mutableStateOf(WeatherState())
+        private set
+
+    var locationPermissionGranted by mutableStateOf(false)
         private set
 
     init {
@@ -29,7 +34,16 @@ class HomeScreenViewModel(
         }
     }
 
+    fun requestLocationPermission(): Boolean {
+        screenModelScope.launch {
+            locationPermissionGranted = locationManager.requestLocationPermission()
+        }
+        return locationPermissionGranted
+    }
+
     private suspend fun fetchWeather() {
+
+
         screenModelScope.launch {
 
             when (val result = api.getWeatherData(28.799520, 76.124420)) {

@@ -2,18 +2,25 @@ package util
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 actual class LocationProvider(
     private val context: Context,
-    private val locationManager: FusedLocationProviderClient
 ) {
+
+    private val locationManager by lazy {
+        LocationServices.getFusedLocationProviderClient(context)
+    }
+
     actual suspend fun requestLocationPermission(): Boolean {
 
         val hasAccessFineLocationPermission = ContextCompat.checkSelfPermission(
@@ -34,7 +41,10 @@ actual class LocationProvider(
                 LocationManager.GPS_PROVIDER
             )
 
-        return !(!hasAccessCoarseLocationPermission || !hasAccessFineLocationPermission || !isGpsEnabled)
+
+
+
+         return !(!hasAccessCoarseLocationPermission || !hasAccessFineLocationPermission || !isGpsEnabled)
 
     }
 

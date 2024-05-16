@@ -14,7 +14,7 @@ actual class KoinInitializer {
     actual fun initialize() {
 
         startKoin {
-            modules(appModule)
+            modules(appModule, locationModule)
 
         }
     }

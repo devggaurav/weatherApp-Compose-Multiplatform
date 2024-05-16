@@ -12,7 +12,7 @@ import platform.CoreLocation.kCLLocationAccuracyHundredMeters
 import platform.Foundation.NSError
 import platform.darwin.NSObject
 
-actual class LocationProvider {
+actual class LocationProvider  {
 
     private val locationManager = CLLocationManager()
     private var lastLocationDeferred: CompletableDeferred<Location?>? = null

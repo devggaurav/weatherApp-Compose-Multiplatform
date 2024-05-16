@@ -1,7 +1,7 @@
 package util
 
 import android.content.Context
-import com.gc.weatherapp.fusedLocationModule
+import com.gc.weatherapp.locationModule
 import di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -19,7 +19,7 @@ actual class KoinInitializer(
         // Initialize Koin
         startKoin {
             androidContext(application)
-            modules(appModule, fusedLocationModule)
+            modules(appModule,locationModule)
 
         }
     }

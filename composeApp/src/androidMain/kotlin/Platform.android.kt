@@ -1,7 +1,7 @@
 import android.os.Build
 
-class AndroidPlatform : Platform {
-    override val name: String = "Android "
-}
 
-actual fun getPlatform(): Platform = AndroidPlatform()
+
+actual fun getPlatform() : Boolean {
+    return true
+}

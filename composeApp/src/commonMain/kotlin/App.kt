@@ -8,11 +8,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import presentation.screen.HomeScreen
+import presentation.screen.HomeScreenViewModel
 
 import weatherappcmm.composeapp.generated.resources.Res
 import weatherappcmm.composeapp.generated.resources.compose_multiplatform
@@ -22,7 +24,9 @@ import weatherappcmm.composeapp.generated.resources.compose_multiplatform
 @Preview
 fun App() {
 
+
     MaterialTheme {
+
         Navigator(HomeScreen())
     }
 }
