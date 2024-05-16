@@ -1,12 +1,16 @@
 package util
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.useContents
 import kotlinx.coroutines.CompletableDeferred
 import platform.CoreLocation.CLLocation
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.CLLocationManagerDelegateProtocol
+import platform.CoreLocation.kCLAuthorizationStatusAuthorizedAlways
+import platform.CoreLocation.kCLAuthorizationStatusAuthorizedWhenInUse
 import platform.CoreLocation.kCLLocationAccuracyHundredMeters
 import platform.Foundation.NSError
+import platform.darwin.NSObject
 
 actual class LocationProvider {
 
@@ -19,14 +23,32 @@ actual class LocationProvider {
 
     @OptIn(ExperimentalForeignApi::class)
     actual suspend fun getLastKnownLocation(): Location? {
-        lastLocationDeferred = CompletableDeferred()
-        locationManager.delegate = object : CLLocationManagerDelegateProtocol {
+        if (!CLLocationManager.locationServicesEnabled()) {
+            return null
+        }
+
+        // Check authorization status
+        val authorizationStatus = CLLocationManager.authorizationStatus()
+        if (authorizationStatus != kCLAuthorizationStatusAuthorizedWhenInUse &&
+            authorizationStatus != kCLAuthorizationStatusAuthorizedAlways
+        ) {
+            return null
+        }
+
+        // Set up delegate
+        val delegate = object : NSObject(), CLLocationManagerDelegateProtocol {
+
             override fun locationManager(manager: CLLocationManager, didUpdateLocations: List<*>) {
-                // Retrieve the most recent location from the list
-                val location = didUpdateLocations.lastOrNull() as? CLLocation
+                val location = didUpdateLocations.firstOrNull()
                 lastLocationDeferred?.complete(
-                    if (location != null) Location(location.coordinate, location.coordinate.longitude)
-                    else null
+                    location?.let {
+                        it as CLLocation
+                        // Convert CLLocation to Location
+                        it.coordinate.useContents {
+                            Location(latitude, longitude)
+                        }
+
+                    }
                 )
                 // Clear the delegate to avoid retaining it
                 locationManager.delegate = null
@@ -34,12 +56,19 @@ actual class LocationProvider {
 
             override fun locationManager(manager: CLLocationManager, didFailWithError: NSError) {
                 lastLocationDeferred?.complete(null)
+                // Clear the delegate to avoid retaining it
                 locationManager.delegate = null
             }
         }
+        locationManager.delegate = delegate
+
+        // Request location updates
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         locationManager.requestLocation()
+
+        // Wait for the result
         return lastLocationDeferred?.await()
     }
+
 
 }
