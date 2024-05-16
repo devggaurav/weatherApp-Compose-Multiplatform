@@ -6,6 +6,7 @@ import domain.WeatherApiService
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import presentation.screen.HomeScreenViewModel
+import util.LocationProvider
 
 
 //
@@ -18,15 +19,10 @@ val appModule = module {
     single<WeatherApiService>{ WeatherApiImpl()}
     factory {
         HomeScreenViewModel(
-            api = get()
+            api = get(),
+            locationManager = get()
         )
     }
 
 }
 
-fun initializeKoin() {
-    startKoin {
-
-        modules(appModule)
-    }
-}
