@@ -38,14 +38,14 @@ import util.LocationProvider
 
 class HomeScreen : Screen {
 
+
     @Composable
     override fun Content() {
-        val permissionGranted = mutableStateOf(false)
 
         val viewModel = getScreenModel<HomeScreenViewModel>()
-        LaunchedEffect(key1 = Unit) {
-            viewModel.requestLocationPermission()
-                    }
+        LaunchedEffect(Unit) {
+            viewModel.checkPermissionAndFetchWeather()
+        }
 
         Box(
             modifier = Modifier.fillMaxSize()

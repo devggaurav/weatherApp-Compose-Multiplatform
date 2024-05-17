@@ -19,7 +19,7 @@ import util.LocationProvider
 
 class HomeScreenViewModel(
     private val api: WeatherApiService,
-    private val locationManager: LocationProvider
+    private val locationProvider: LocationProvider
 ) : ScreenModel {
 
     var state by mutableStateOf(WeatherState())
@@ -29,47 +29,54 @@ class HomeScreenViewModel(
         private set
 
     init {
-        screenModelScope.launch {
-            fetchWeather()
-        }
+        checkPermissionAndFetchWeather()
     }
 
-    fun requestLocationPermission(): Boolean {
+
+    fun checkPermissionAndFetchWeather() {
+
         screenModelScope.launch {
-            locationPermissionGranted = locationManager.requestLocationPermission()
+            if (locationProvider.requestLocationPermission()) {
+                fetchWeather()
+            }
         }
-        return locationPermissionGranted
+
     }
 
-    private suspend fun fetchWeather() {
+
+
+
+    suspend fun fetchWeather() {
 
 
         screenModelScope.launch {
+            locationProvider.getLastKnownLocation()?.let {
+                when (val result = api.getWeatherData(it.latitude, it.longitude)) {
+                    is RequestState.Error -> {
+                        state = state.copy(
+                            weatherInfo = null,
+                            isLoading = false,
+                            error = result.getErrorMessage()
+                        )
+                    }
 
-            when (val result = api.getWeatherData(28.799520, 76.124420)) {
-                is RequestState.Error -> {
-                    state = state.copy(
-                        weatherInfo = null,
-                        isLoading = false,
-                        error = result.getErrorMessage()
-                    )
+                    RequestState.Idle -> {}
+                    RequestState.Loading -> {
+                        state = state.copy(
+                            isLoading = true,
+                            error = null
+                        )
+                    }
+
+                    is RequestState.Success -> {
+                        state = state.copy(
+                            weatherInfo = result.getSuccessData(),
+                            isLoading = false,
+                            error = null
+                        )
+                    }
                 }
 
-                RequestState.Idle -> {}
-                RequestState.Loading -> {
-                    state = state.copy(
-                        isLoading = true,
-                        error = null
-                    )
-                }
-
-                is RequestState.Success -> {
-                    state = state.copy(
-                        weatherInfo = result.getSuccessData(),
-                        isLoading = false,
-                        error = null
-                    )
-                }
             }
 
 

@@ -24,9 +24,7 @@ import weatherappcmm.composeapp.generated.resources.compose_multiplatform
 @Preview
 fun App() {
 
-
     MaterialTheme {
-
         Navigator(HomeScreen())
     }
 }
