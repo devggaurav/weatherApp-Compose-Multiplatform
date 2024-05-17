@@ -20,7 +20,7 @@ val appModule = module {
     factory {
         HomeScreenViewModel(
             api = get(),
-            locationManager = get()
+            locationProvider = get()
         )
     }
 

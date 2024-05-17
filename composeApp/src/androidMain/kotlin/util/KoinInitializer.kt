@@ -19,7 +19,7 @@ actual class KoinInitializer(
         // Initialize Koin
         startKoin {
             androidContext(application)
-            modules(appModule,locationModule)
+            modules(appModule, locationModule)
 
         }
     }
