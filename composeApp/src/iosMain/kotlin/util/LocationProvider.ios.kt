@@ -3,7 +3,9 @@ package util
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import platform.CoreLocation.CLAuthorizationStatus
 import platform.CoreLocation.CLLocation
 import platform.CoreLocation.CLLocationManager
@@ -18,10 +20,9 @@ import kotlin.coroutines.resume
 
 actual class LocationProvider {
 
-    private val locationManager = CLLocationManager()
-    private var lastLocationDeferred: CompletableDeferred<Location?>? = null
 
     actual suspend fun requestLocationPermission(): Boolean {
+        logMessage("I am requested for permission")
         val locationManager = CLLocationManager()
         val status = CLLocationManager.authorizationStatus()
         return when (status) {
@@ -53,52 +54,56 @@ actual class LocationProvider {
 
 
     @OptIn(ExperimentalForeignApi::class)
-    actual suspend fun getLastKnownLocation(): Location? {
+    actual suspend fun getLastKnownLocation(): Location? = withContext(Dispatchers.Main) {
         if (!CLLocationManager.locationServicesEnabled()) {
-            return null
+            logMessage("Location services are disabled.")
+            return@withContext null
         }
+        logMessage("Location services are enabled.")
 
-        // Check authorization status
         val authorizationStatus = CLLocationManager.authorizationStatus()
         if (authorizationStatus != kCLAuthorizationStatusAuthorizedWhenInUse &&
-            authorizationStatus != kCLAuthorizationStatusAuthorizedAlways
-        ) {
-            return null
+            authorizationStatus != kCLAuthorizationStatusAuthorizedAlways) {
+            logMessage("Location authorization status is not sufficient: $authorizationStatus")
+            return@withContext null
         }
+        logMessage("Location authorization status is sufficient.")
 
-        // Set up delegate
+        val locationManager = CLLocationManager()
+        val locationDeferred = CompletableDeferred<Location?>()
+
         val delegate = object : NSObject(), CLLocationManagerDelegateProtocol {
-
             override fun locationManager(manager: CLLocationManager, didUpdateLocations: List<*>) {
-                val location = didUpdateLocations.firstOrNull()
-                lastLocationDeferred?.complete(
+                val location = didUpdateLocations.firstOrNull() as? CLLocation
+                logMessage("Did update locations: $location")
+                locationDeferred.complete(
                     location?.let {
-                        it as CLLocation
-                        // Convert CLLocation to Location
-                        it.coordinate.useContents {
-                            Location(latitude, longitude)
-                        }
-
+                        Location(
+                            it.coordinate.useContents { latitude },
+                            it.coordinate.useContents { longitude }
+                        )
                     }
                 )
-                // Clear the delegate to avoid retaining it
-                locationManager.delegate = null
+                manager.stopUpdatingLocation()
+                manager.delegate = null // Clear the delegate to avoid retaining it
             }
 
             override fun locationManager(manager: CLLocationManager, didFailWithError: NSError) {
-                lastLocationDeferred?.complete(null)
-                // Clear the delegate to avoid retaining it
-                locationManager.delegate = null
+                logMessage("Failed to get location: ${didFailWithError.localizedDescription}")
+                locationDeferred.complete(null)
+                manager.stopUpdatingLocation()
+                manager.delegate = null // Clear the delegate to avoid retaining it
             }
         }
+
         locationManager.delegate = delegate
 
-        // Request location updates
+        logMessage("Requesting location updates.")
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-        locationManager.requestLocation()
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.startUpdatingLocation()
 
-        // Wait for the result
-        return lastLocationDeferred?.await()
+        locationDeferred.await()
     }
 
 

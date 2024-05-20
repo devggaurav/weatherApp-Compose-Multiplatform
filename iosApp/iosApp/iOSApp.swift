@@ -11,4 +11,5 @@ struct iOSApp: App {
             ContentView().ignoresSafeArea()
         }
     }
+    
 }

@@ -28,17 +28,15 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
 
-    //private val viewModel: HomeScreenViewModel by inject()
+    private val viewModel: HomeScreenViewModel by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         permissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) {
-            setContent {
-                App()
-            }
 
+          viewModel.checkPermission()
         }
 
         lifecycleScope.launch {
@@ -57,6 +55,11 @@ class MainActivity : ComponentActivity() {
             }
 
         }
+
+        setContent {
+            App()
+        }
+
 
     }
 }

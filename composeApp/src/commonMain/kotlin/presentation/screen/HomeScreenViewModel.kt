@@ -10,10 +10,14 @@ import domain.model.RequestState
 import getPlatform
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import presentation.components.WeatherState
 import util.LocationProvider
 import util.PermissionHandler
+import util.logMessage
 
 
 //
@@ -29,32 +33,38 @@ class HomeScreenViewModel(
     var state by mutableStateOf(WeatherState())
         private set
 
-    var locationPermissionGranted by mutableStateOf(false)
-        private set
+    var _locationPermissionGranted = MutableStateFlow(false)
+    val locationPermissionGranted: StateFlow<Boolean> = _locationPermissionGranted.asStateFlow()
 
     init {
-        // checkPermissionAndFetchWeather()
+
+        checkPermission()
+
     }
 
-
-    fun checkPermissionAndFetchWeather() {
+    fun checkPermission() {
 
         screenModelScope.launch {
-            if (locationProvider.requestLocationPermission()) {
+            val permission = locationProvider.requestLocationPermission()
+            _locationPermissionGranted.value = permission
+            logMessage(permission.toString())
+            logMessage(locationPermissionGranted.toString())
+            if (permission) {
                 fetchWeather()
             }
         }
-
-
     }
 
 
-    suspend fun fetchWeather() {
 
 
-        screenModelScope.launch(Dispatchers.IO) {
+
+    private suspend fun fetchWeather() {
+
+
+        screenModelScope.launch(Dispatchers.Main) {
             locationProvider.getLastKnownLocation()?.let {
-                println("I am location ${it.latitude} ${it.longitude}")
+                logMessage("I am location ${it.latitude} ${it.longitude}")
                 when (val result = api.getWeatherData(it.latitude, it.longitude)) {
                     is RequestState.Error -> {
                         state = state.copy(
