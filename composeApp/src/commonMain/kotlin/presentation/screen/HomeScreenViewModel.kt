@@ -7,9 +7,13 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import domain.WeatherApiService
 import domain.model.RequestState
+import getPlatform
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import presentation.components.WeatherState
 import util.LocationProvider
+import util.PermissionHandler
 
 
 //
@@ -29,7 +33,7 @@ class HomeScreenViewModel(
         private set
 
     init {
-        checkPermissionAndFetchWeather()
+        // checkPermissionAndFetchWeather()
     }
 
 
@@ -41,16 +45,16 @@ class HomeScreenViewModel(
             }
         }
 
+
     }
-
-
 
 
     suspend fun fetchWeather() {
 
 
-        screenModelScope.launch {
+        screenModelScope.launch(Dispatchers.IO) {
             locationProvider.getLastKnownLocation()?.let {
+                println("I am location ${it.latitude} ${it.longitude}")
                 when (val result = api.getWeatherData(it.latitude, it.longitude)) {
                     is RequestState.Error -> {
                         state = state.copy(

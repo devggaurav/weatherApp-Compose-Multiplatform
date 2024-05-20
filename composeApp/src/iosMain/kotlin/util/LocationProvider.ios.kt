@@ -3,23 +3,54 @@ package util
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.suspendCancellableCoroutine
+import platform.CoreLocation.CLAuthorizationStatus
 import platform.CoreLocation.CLLocation
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.CLLocationManagerDelegateProtocol
 import platform.CoreLocation.kCLAuthorizationStatusAuthorizedAlways
 import platform.CoreLocation.kCLAuthorizationStatusAuthorizedWhenInUse
+import platform.CoreLocation.kCLAuthorizationStatusNotDetermined
 import platform.CoreLocation.kCLLocationAccuracyHundredMeters
 import platform.Foundation.NSError
 import platform.darwin.NSObject
+import kotlin.coroutines.resume
 
-actual class LocationProvider  {
+actual class LocationProvider {
 
     private val locationManager = CLLocationManager()
     private var lastLocationDeferred: CompletableDeferred<Location?>? = null
+
     actual suspend fun requestLocationPermission(): Boolean {
-        locationManager.requestWhenInUseAuthorization()
-        return true
+        val locationManager = CLLocationManager()
+        val status = CLLocationManager.authorizationStatus()
+        return when (status) {
+            kCLAuthorizationStatusNotDetermined -> {
+                val deferred = suspendCancellableCoroutine<Boolean> { continuation ->
+                    locationManager.requestWhenInUseAuthorization()
+                    locationManager.delegate = object : NSObject(),
+                        CLLocationManagerDelegateProtocol {
+                        override fun locationManager(
+                            manager: CLLocationManager,
+                            didChangeAuthorizationStatus: CLAuthorizationStatus
+                        ) {
+                            if (didChangeAuthorizationStatus == kCLAuthorizationStatusAuthorizedWhenInUse) {
+                                continuation.resume(true)
+                            } else {
+                                continuation.resume(false)
+                            }
+                            locationManager.delegate = null
+                        }
+                    }
+                }
+                deferred
+            }
+
+            kCLAuthorizationStatusAuthorizedWhenInUse -> true
+            else -> false
+        }
     }
+
 
     @OptIn(ExperimentalForeignApi::class)
     actual suspend fun getLastKnownLocation(): Location? {
