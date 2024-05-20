@@ -5,4 +5,9 @@ fun MainViewController() = ComposeUIViewController (
     configure = {
         KoinInitializer().initialize()
     }
-){ App() }
+){
+
+    App()
+
+
+}
