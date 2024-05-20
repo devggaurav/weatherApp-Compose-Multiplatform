@@ -23,6 +23,8 @@
   - [ViewModel](https://voyager.adriel.cafe/) - Stores UI-related data that isn't destroyed on UI changes using Voyager Lib. 
   - [Koin](https://insert-koin.io/docs/setup/koin/) - Koin for DI.
   - [Ktor](https://ktor.io/docs/client-create-multiplatform-application.html) -Ktor for HTTP client.
+  - [Voyager](https://voyager.adriel.cafe/) - For view-model and navigation.
+  - [Material 3](https://m3.material.io/) -For compose design .
 
 - [Material Components for Android](https://github.com/material-components/material-components-android) - Modular and customizable Material Design UI components for Android.
 
